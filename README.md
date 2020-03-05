@@ -1,10 +1,10 @@
 # Builder - fluent immutable builders for Go
 
-[![GoDoc](https://godoc.org/github.com/lann/builder?status.png)](https://godoc.org/github.com/lann/builder)
-[![Build Status](https://travis-ci.org/lann/builder.png?branch=master)](https://travis-ci.org/lann/builder)
+[![GoDoc](https://godoc.org/github.com/unrotten/builder?status.png)](https://godoc.org/github.com/unrotten/builder)
+[![Build Status](https://travis-ci.org/unrotten/builder.png?branch=master)](https://travis-ci.org/unrotten/builder)
 
 Builder was originally written for
-[Squirrel](https://github.com/lann/squirrel), a fluent SQL generator. It
+[Squirrel](https://github.com/unrotten/squirrel), a fluent SQL generator. It
 is probably the best example of Builder in action.
 
 Builder helps you write **fluent** DSLs for your libraries with method chaining:
@@ -30,7 +30,7 @@ Builder makes it easy to **build** structs using the **builder** pattern
 (*surprise!*):
 
 ```go
-import "github.com/lann/builder"
+import "github.com/unrotten/builder"
 
 type Muppet struct {
     Name string

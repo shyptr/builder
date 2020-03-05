@@ -185,6 +185,14 @@ func GetStruct(builder interface{}) interface{} {
 	return scanStruct(builder, structVal)
 }
 
+func GetStructByTag(builder interface{}, tag string) interface{} {
+	structVal := newBuilderStruct(reflect.TypeOf(builder))
+	if structVal == nil {
+		return nil
+	}
+	return scanStructByTag(builder, structVal, tag)
+}
+
 // GetStructLike builds a new struct from the given builder with the same type
 // as the given struct.
 //
@@ -197,6 +205,11 @@ func GetStruct(builder interface{}) interface{} {
 func GetStructLike(builder interface{}, strct interface{}) interface{} {
 	structVal := reflect.New(reflect.TypeOf(strct)).Elem()
 	return scanStruct(builder, &structVal)
+}
+
+func GetStructLikeByTag(builder interface{}, strct interface{}, tag string) interface{} {
+	structVal := reflect.New(reflect.TypeOf(strct)).Elem()
+	return scanStructByTag(builder, &structVal, tag)
 }
 
 func scanStruct(builder interface{}, structVal *reflect.Value) interface{} {
@@ -221,5 +234,37 @@ func scanStruct(builder interface{}, structVal *reflect.Value) interface{} {
 		}
 	})
 
+	return structVal.Interface()
+}
+
+func scanStructByTag(builder interface{}, structVal *reflect.Value, tag string) interface{} {
+	structType := structVal.Type()
+	for i := 0; i < structVal.NumField(); i++ {
+		fieldType := structType.Field(i)
+		if ast.IsExported(fieldType.Name) {
+			name := fieldType.Tag.Get(tag)
+			if name == "" || name == "-" {
+				continue
+			}
+			val, ok := getBuilderMap(builder).Lookup(name)
+			if ok {
+				field := structVal.Field(i)
+				var value reflect.Value
+				switch v := val.(type) {
+				case nil:
+					switch field.Kind() {
+					case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:
+						value = reflect.Zero(field.Type())
+					}
+					// nil is not valid for this Type; Set will panic
+				case ps.List:
+					value = listToSlice(v, field.Type())
+				default:
+					value = reflect.ValueOf(val)
+				}
+				field.Set(value)
+			}
+		}
+	}
 	return structVal.Interface()
 }

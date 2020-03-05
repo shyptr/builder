@@ -2,7 +2,7 @@ package builder_test
 
 import (
 	"fmt"
-	"github.com/lann/builder"
+	"github.com/unrotten/builder"
 )
 
 // Simple math expression allowing multiple adds/subtracts and a single
@@ -14,9 +14,15 @@ type simpleExpr struct {
 }
 
 func (e simpleExpr) Equals() (total int) {
-	for _, i := range e.Adds { total += i }
-	for _, i := range e.Subtracts { total -= i }
-	if e.Multiplier != 0 { total *= e.Multiplier }
+	for _, i := range e.Adds {
+		total += i
+	}
+	for _, i := range e.Subtracts {
+		total -= i
+	}
+	if e.Multiplier != 0 {
+		total *= e.Multiplier
+	}
 	return
 }
 
@@ -41,8 +47,7 @@ func (b simpleExprBuilder) Equals() int {
 }
 
 // SimpleExprBuilder is an empty builder
-var SimpleExprBuilder =
-	builder.Register(simpleExprBuilder{}, simpleExpr{}).(simpleExprBuilder)
+var SimpleExprBuilder = builder.Register(simpleExprBuilder{}, simpleExpr{}).(simpleExprBuilder)
 
 // End builder definition
 

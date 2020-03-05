@@ -1,16 +1,16 @@
 package builder_test
 
 import (
-	"github.com/lann/builder"
+	"github.com/unrotten/builder"
 	"reflect"
 	"testing"
 )
 
 type Foo struct {
-	X   int
-	Y   int
-	I   interface{}
-	Add []int
+	X   int         `db:"x"`
+	Y   int         `db:"y"`
+	I   interface{} `db:"i"`
+	Add []int       `db:"add"`
 }
 
 type fooBuilder builder.Builder
@@ -137,9 +137,24 @@ func TestGetStruct(t *testing.T) {
 	}
 }
 
+func TestGetStructByTag(t *testing.T) {
+	b := builder.Set(FooBuilder, "x", 1).(fooBuilder)
+	b = builder.Set(b, "y", 2).(fooBuilder)
+	b = builder.Append(b, "add", 3).(fooBuilder)
+	b = builder.Append(b, "add", 4).(fooBuilder)
+	s := builder.GetStructByTag(b, "db").(Foo)
+	expected := Foo{X: 1, Y: 2, Add: []int{3, 4}}
+	if !reflect.DeepEqual(s, expected) {
+		t.Errorf("expected %v, got %v", expected, s)
+	}
+}
+
 func TestGetStructLike(t *testing.T) {
-	b := FooBuilder.X(1).Y(2).Add(3).Add(4)
-	s := builder.GetStructLike(b, Foo{}).(Foo)
+	b := builder.Set(builder.EmptyBuilder, "x", 1).(builder.Builder)
+	b = builder.Set(b, "y", 2).(builder.Builder)
+	b = builder.Append(b, "add", 3).(builder.Builder)
+	b = builder.Append(b, "add", 4).(builder.Builder)
+	s := builder.GetStructLikeByTag(b, Foo{}, "db").(Foo)
 	expected := Foo{X: 1, Y: 2, Add: []int{3, 4}}
 	if !reflect.DeepEqual(s, expected) {
 		t.Errorf("expected %v, got %v", expected, s)

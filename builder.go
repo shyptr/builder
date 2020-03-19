@@ -208,9 +208,9 @@ func GetStructLike(builder interface{}, strct interface{}) interface{} {
 	return scanStruct(builder, &structVal)
 }
 
-func GetStructLikeByTag(builder interface{}, strct interface{}, tag string) interface{} {
+func GetStructLikeByTag(builder interface{}, strct interface{}, tag string, sep ...string) interface{} {
 	structVal := reflect.New(reflect.TypeOf(strct)).Elem()
-	return scanStructByTag(builder, &structVal, tag)
+	return scanStructByTag(builder, &structVal, tag, sep...)
 }
 
 func scanStruct(builder interface{}, structVal *reflect.Value) interface{} {

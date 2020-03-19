@@ -242,9 +242,12 @@ func scanStructByTag(builder interface{}, structVal *reflect.Value, tag string) 
 	for i := 0; i < structVal.NumField(); i++ {
 		fieldType := structType.Field(i)
 		if ast.IsExported(fieldType.Name) {
-			name := fieldType.Tag.Get(tag)
-			if name == "" || name == "-" {
+			name, ok := fieldType.Tag.Lookup(tag)
+			if ok && (name == "" || name == "-") {
 				continue
+			}
+			if !ok {
+				name = fieldType.Name
 			}
 			val, ok := getBuilderMap(builder).Lookup(name)
 			if ok {

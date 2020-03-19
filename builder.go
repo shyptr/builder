@@ -5,6 +5,7 @@ import (
 	"github.com/lann/ps"
 	"go/ast"
 	"reflect"
+	"strings"
 )
 
 // Builder stores a set of named values.
@@ -185,12 +186,12 @@ func GetStruct(builder interface{}) interface{} {
 	return scanStruct(builder, structVal)
 }
 
-func GetStructByTag(builder interface{}, tag string) interface{} {
+func GetStructByTag(builder interface{}, tag string, sep ...string) interface{} {
 	structVal := newBuilderStruct(reflect.TypeOf(builder))
 	if structVal == nil {
 		return nil
 	}
-	return scanStructByTag(builder, structVal, tag)
+	return scanStructByTag(builder, structVal, tag, sep)
 }
 
 // GetStructLike builds a new struct from the given builder with the same type
@@ -237,14 +238,20 @@ func scanStruct(builder interface{}, structVal *reflect.Value) interface{} {
 	return structVal.Interface()
 }
 
-func scanStructByTag(builder interface{}, structVal *reflect.Value, tag string) interface{} {
+func scanStructByTag(builder interface{}, structVal *reflect.Value, tag string, sep ...string) interface{} {
 	structType := structVal.Type()
 	for i := 0; i < structVal.NumField(); i++ {
 		fieldType := structType.Field(i)
 		if ast.IsExported(fieldType.Name) {
 			name, ok := fieldType.Tag.Lookup(tag)
-			if ok && (name == "" || name == "-") {
-				continue
+			if ok {
+				if name == "" || name == "-" {
+					continue
+				}
+				if len(sep) > 0 {
+					split := strings.Split(name, sep[0])
+					name = split[0]
+				}
 			}
 			if !ok {
 				name = fieldType.Name

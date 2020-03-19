@@ -191,7 +191,7 @@ func GetStructByTag(builder interface{}, tag string, sep ...string) interface{} 
 	if structVal == nil {
 		return nil
 	}
-	return scanStructByTag(builder, structVal, tag, sep)
+	return scanStructByTag(builder, structVal, tag, sep...)
 }
 
 // GetStructLike builds a new struct from the given builder with the same type

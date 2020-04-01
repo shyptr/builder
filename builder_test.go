@@ -1,7 +1,7 @@
 package builder_test
 
 import (
-	"github.com/unrotten/builder"
+	"github.com/shyptr/builder"
 	"reflect"
 	"testing"
 )

@@ -2,7 +2,7 @@ package builder_test
 
 import (
 	"fmt"
-	"github.com/unrotten/builder"
+	"github.com/shyptr/builder"
 )
 
 // Simple math expression allowing multiple adds/subtracts and a single

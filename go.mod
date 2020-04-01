@@ -1,4 +1,4 @@
-module github.com/unrotten/builder
+module github.com/shyptr/builder
 
 go 1.13
 

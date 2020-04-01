@@ -2,6 +2,7 @@
 package builder
 
 import (
+	"fmt"
 	"github.com/lann/ps"
 	"go/ast"
 	"reflect"
@@ -217,7 +218,15 @@ func scanStruct(builder interface{}, structVal *reflect.Value) interface{} {
 	getBuilderMap(builder).ForEach(func(name string, val ps.Any) {
 		if ast.IsExported(name) {
 			field := structVal.FieldByName(name)
-
+			if field.IsValid() {
+				field.Set(reflect.New(field.Type()).Elem())
+			}
+			for field.Kind() == reflect.Ptr {
+				if field.IsNil() {
+					field.Set(reflect.New(field.Type().Elem()))
+				}
+				field = field.Elem()
+			}
 			var value reflect.Value
 			switch v := val.(type) {
 			case nil:
@@ -230,6 +239,9 @@ func scanStruct(builder interface{}, structVal *reflect.Value) interface{} {
 				value = listToSlice(v, field.Type())
 			default:
 				value = reflect.ValueOf(val)
+			}
+			if !value.Type().ConvertibleTo(field.Type()) {
+				panic(fmt.Sprintf("type error,set %s to %s", value.Type().String(), field.Type().String()))
 			}
 			field.Set(value)
 		}
@@ -259,6 +271,15 @@ func scanStructByTag(builder interface{}, structVal *reflect.Value, tag string, 
 			val, ok := getBuilderMap(builder).Lookup(name)
 			if ok {
 				field := structVal.Field(i)
+				if field.IsValid() {
+					field.Set(reflect.New(field.Type()).Elem())
+				}
+				for field.Kind() == reflect.Ptr {
+					if field.IsNil() {
+						field.Set(reflect.New(field.Type().Elem()))
+					}
+					field = field.Elem()
+				}
 				var value reflect.Value
 				switch v := val.(type) {
 				case nil:
@@ -272,7 +293,10 @@ func scanStructByTag(builder interface{}, structVal *reflect.Value, tag string, 
 				default:
 					value = reflect.ValueOf(val)
 				}
-				field.Set(value)
+				if !value.Type().ConvertibleTo(field.Type()) {
+					panic(fmt.Sprintf("type error,set %s to %s", value.Type().String(), field.Type().String()))
+				}
+				field.Set(value.Convert(field.Type()))
 			}
 		}
 	}
